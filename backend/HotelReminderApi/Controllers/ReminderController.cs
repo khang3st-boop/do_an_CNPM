@@ -16,6 +16,7 @@ public class ReminderController : ControllerBase
             RoomNumber = "101",
             ReminderTime = DateTime.Now.AddHours(2),
             AssignedTo = "Lễ tân",
+            Type = "Check-out",
             Status = "pending"
         },
         new Reminder
@@ -26,7 +27,19 @@ public class ReminderController : ControllerBase
             RoomNumber = "202",
             ReminderTime = DateTime.Now.AddHours(3),
             AssignedTo = "Nhân viên dọn phòng",
+            Type = "Dọn phòng",
             Status = "processing"
+        },
+        new Reminder
+        {
+            Id = 3,
+            Title = "Nhắc bảo trì phòng",
+            Content = "Phòng 305 cần kiểm tra máy lạnh.",
+            RoomNumber = "305",
+            ReminderTime = DateTime.Now.AddDays(1),
+            AssignedTo = "Nhân viên bảo trì",
+            Type = "Bảo trì",
+            Status = "pending"
         }
     };
 
@@ -55,8 +68,8 @@ public class ReminderController : ControllerBase
     [HttpPost]
     public IActionResult Create([FromBody] Reminder request)
     {
-        request.Id = Reminders.Count + 1;
-        request.Status = "pending";
+        request.Id = Reminders.Count == 0 ? 1 : Reminders.Max(x => x.Id) + 1;
+        request.Status = string.IsNullOrWhiteSpace(request.Status) ? "pending" : request.Status;
 
         Reminders.Add(request);
 
@@ -64,6 +77,34 @@ public class ReminderController : ControllerBase
         {
             message = "Tạo thông báo nhắc lịch thành công",
             data = request
+        });
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult Update(int id, [FromBody] Reminder request)
+    {
+        var reminder = Reminders.FirstOrDefault(x => x.Id == id);
+
+        if (reminder == null)
+        {
+            return NotFound(new
+            {
+                message = "Không tìm thấy thông báo nhắc lịch"
+            });
+        }
+
+        reminder.Title = request.Title;
+        reminder.Content = request.Content;
+        reminder.RoomNumber = request.RoomNumber;
+        reminder.ReminderTime = request.ReminderTime;
+        reminder.AssignedTo = request.AssignedTo;
+        reminder.Type = request.Type;
+        reminder.Status = request.Status;
+
+        return Ok(new
+        {
+            message = "Cập nhật thông báo thành công",
+            data = reminder
         });
     }
 
@@ -89,8 +130,29 @@ public class ReminderController : ControllerBase
         });
     }
 
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
+    {
+        var reminder = Reminders.FirstOrDefault(x => x.Id == id);
+
+        if (reminder == null)
+        {
+            return NotFound(new
+            {
+                message = "Không tìm thấy thông báo nhắc lịch"
+            });
+        }
+
+        Reminders.Remove(reminder);
+
+        return Ok(new
+        {
+            message = "Xóa thông báo nhắc lịch thành công"
+        });
+    }
+
     [HttpGet("filter")]
-    public IActionResult Filter([FromQuery] string? roomNumber, [FromQuery] string? status)
+    public IActionResult Filter([FromQuery] string? roomNumber, [FromQuery] string? status, [FromQuery] string? type)
     {
         var query = Reminders.AsQueryable();
 
@@ -102,6 +164,11 @@ public class ReminderController : ControllerBase
         if (!string.IsNullOrWhiteSpace(status))
         {
             query = query.Where(x => x.Status == status);
+        }
+
+        if (!string.IsNullOrWhiteSpace(type))
+        {
+            query = query.Where(x => x.Type == type);
         }
 
         return Ok(query.ToList());
@@ -116,6 +183,7 @@ public class Reminder
     public string RoomNumber { get; set; } = string.Empty;
     public DateTime ReminderTime { get; set; }
     public string AssignedTo { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
     public string Status { get; set; } = "pending";
 }
 
