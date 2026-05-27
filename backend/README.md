@@ -1,27 +1,32 @@
 # Backend API - Quản lý thông báo nhắc lịch khách sạn
 
-Phần backend của hệ thống website hỗ trợ quản lý thông báo nhắc lịch trong khách sạn.
+Backend được xây dựng theo mô hình ASP.NET Core Web API, sử dụng Controller để định nghĩa các API endpoint.
 
-## Nhiệm vụ backend
+## Controller chính
 
-- Xử lý đăng nhập cho người dùng
-- Quản lý thông báo nhắc lịch
+### AuthController
+
+Xử lý đăng nhập và phân quyền người dùng.
+
+API:
+- POST /api/auth/login
+
+### ReminderController
+
+Xử lý quản lý thông báo nhắc lịch trong khách sạn.
+
+API:
+- GET /api/reminders
+- GET /api/reminders/{id}
+- POST /api/reminders
+- PUT /api/reminders/{id}/status
+- GET /api/reminders/filter
+
+## Chức năng backend
+
+- Đăng nhập hệ thống
+- Xem danh sách thông báo nhắc lịch
+- Xem chi tiết thông báo
 - Tạo thông báo nhắc lịch mới
-- Xem danh sách thông báo
-- Lọc thông báo theo ngày, phòng, nhân viên
 - Cập nhật trạng thái thông báo
-- Hỗ trợ phân công nhân viên xử lý công việc
-
-## Vai trò người dùng
-
-- Quản trị viên
-- Lễ tân
-- Nhân viên dọn phòng
-- Nhân viên bảo trì
-
-## Trạng thái thông báo
-
-- pending: Chưa xử lý
-- processing: Đang xử lý
-- completed: Đã hoàn thành
-- cancelled: Đã hủy
+- Lọc thông báo theo phòng hoặc trạng thái
