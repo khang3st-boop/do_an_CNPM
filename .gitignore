@@ -1,8 +1,7 @@
-venv/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
+node_modules/
+do_an_CNPM/
 .env
-hotel_reminder.db
-.vscode/
+dist/
+build/
+.DS_Store
+node_modules/
