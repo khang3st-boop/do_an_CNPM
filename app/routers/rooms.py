@@ -18,6 +18,7 @@ def get_rooms(
     keyword: Optional[str] = None,
     status_filter: Optional[str] = None,
     room_type: Optional[str] = None,
+    include_inactive: bool = False,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_admin_or_manager),
 ):
@@ -35,8 +36,10 @@ def get_rooms(
             raise HTTPException(
                 status_code=400,
                 detail="Trạng thái phòng không hợp lệ",
-            )
+        )
         query = query.filter(Room.status == status_filter)
+    elif not include_inactive:
+        query = query.filter(Room.is_active == True, Room.status != "inactive")
 
     if room_type:
         room_type = room_type.strip()
@@ -71,6 +74,7 @@ def create_room(
         capacity=request.capacity,
         price_per_night=request.price_per_night,
         status=request.status,
+        is_active=request.is_active and request.status != "inactive",
         note=request.note,
     )
 
@@ -88,6 +92,7 @@ def create_room(
             "capacity": new_room.capacity,
             "price_per_night": new_room.price_per_night,
             "status": new_room.status,
+            "is_active": new_room.is_active,
             "note": new_room.note,
         },
     )
@@ -109,6 +114,7 @@ def update_room_status(
         )
 
     room.status = request.status
+    room.is_active = request.status != "inactive"
 
     db.commit()
     db.refresh(room)
@@ -119,6 +125,7 @@ def update_room_status(
             "id": room.id,
             "room_number": room.room_number,
             "status": room.status,
+            "is_active": room.is_active,
         },
     )
 
@@ -138,6 +145,7 @@ def deactivate_room(
         )
 
     room.status = "inactive"
+    room.is_active = False
 
     db.commit()
     db.refresh(room)
@@ -148,5 +156,6 @@ def deactivate_room(
             "id": room.id,
             "room_number": room.room_number,
             "status": room.status,
+            "is_active": room.is_active,
         },
     )

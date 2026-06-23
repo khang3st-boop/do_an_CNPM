@@ -66,6 +66,7 @@ class RoomCreateRequest(BaseModel):
     capacity: int = Field(default=2, ge=1)
     price_per_night: float = Field(default=0, ge=0)
     status: str = "available"
+    is_active: bool = True
     note: Optional[str] = None
 
     @field_validator("room_number", "room_type", "note", mode="before")
@@ -82,6 +83,75 @@ class RoomCreateRequest(BaseModel):
         if value not in ALLOWED_ROOM_STATUSES:
             raise ValueError("Trang thai phong khong hop le")
         return value
+
+
+class GuestCreateRequest(BaseModel):
+    full_name: str = Field(..., min_length=2, max_length=255)
+    phone: Optional[str] = Field(default=None, max_length=20)
+    email: Optional[str] = Field(default=None, max_length=255)
+    identity_number: Optional[str] = Field(default=None, max_length=50)
+    room_id: int = Field(..., ge=1)
+    check_in_date: datetime
+    check_out_date: Optional[datetime] = None
+
+    @field_validator("full_name", "phone", "email", "identity_number", mode="before")
+    @classmethod
+    def strip_text(cls, value):
+        if isinstance(value, str):
+            value = value.strip()
+        return value or None
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, value: Optional[str]):
+        if value is None:
+            return value
+        value = value.strip().lower()
+        if "@" not in value or "." not in value.split("@")[-1]:
+            raise ValueError("Email khong hop le")
+        return value
+
+    @model_validator(mode="after")
+    def validate_dates(self):
+        if self.check_out_date and self.check_out_date <= self.check_in_date:
+            raise ValueError("Ngay check-out phai lon hon ngay check-in")
+        return self
+
+
+class GuestUpdateRequest(BaseModel):
+    full_name: Optional[str] = Field(default=None, min_length=2, max_length=255)
+    phone: Optional[str] = Field(default=None, max_length=20)
+    email: Optional[str] = Field(default=None, max_length=255)
+    identity_number: Optional[str] = Field(default=None, max_length=50)
+    room_id: Optional[int] = Field(default=None, ge=1)
+    check_in_date: Optional[datetime] = None
+    check_out_date: Optional[datetime] = None
+    is_active: Optional[bool] = None
+
+    @field_validator("full_name", "phone", "email", "identity_number", mode="before")
+    @classmethod
+    def strip_text(cls, value):
+        if isinstance(value, str):
+            value = value.strip()
+        return value or None
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, value: Optional[str]):
+        if value is None:
+            return value
+        value = value.strip().lower()
+        if "@" not in value or "." not in value.split("@")[-1]:
+            raise ValueError("Email khong hop le")
+        return value
+
+    @model_validator(mode="after")
+    def validate_payload(self):
+        if not any(value is not None for value in self.model_dump().values()):
+            raise ValueError("Can cung cap it nhat mot thong tin can cap nhat")
+        if self.check_in_date and self.check_out_date and self.check_out_date <= self.check_in_date:
+            raise ValueError("Ngay check-out phai lon hon ngay check-in")
+        return self
 
 
 class RoomStatusRequest(BaseModel):

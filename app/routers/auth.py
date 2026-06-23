@@ -36,8 +36,9 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     return api_response(
         "Đăng nhập thành công",
         {
+            "access_token": token,
             "token": token,
-            "token_type": "Bearer",
+            "token_type": "bearer",
             "user": {
                 "id": user.id,
                 "name": user.name,

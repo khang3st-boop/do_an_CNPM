@@ -5,11 +5,12 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import inspect, text
 
 from app.auth import hash_password
 from app.database import Base, SessionLocal, engine
-from app.models import Notification, NotificationRecipient, Reminder, Room, User
-from app.routers import auth, notifications, reminders, rooms, users
+from app.models import Guest, Notification, NotificationRecipient, Reminder, Room, User
+from app.routers import auth, guests, notifications, reminders, rooms, users
 
 
 app = FastAPI(
@@ -85,6 +86,7 @@ def create_default_data():
                     capacity=2,
                     price_per_night=500000,
                     status="available",
+                    is_active=True,
                     note="Phòng tiêu chuẩn",
                 ),
                 Room(
@@ -94,6 +96,7 @@ def create_default_data():
                     capacity=2,
                     price_per_night=850000,
                     status="available",
+                    is_active=True,
                     note="Phòng hướng thành phố",
                 ),
                 Room(
@@ -103,6 +106,7 @@ def create_default_data():
                     capacity=4,
                     price_per_night=1200000,
                     status="maintenance",
+                    is_active=True,
                     note="Đang bảo trì điều hòa",
                 ),
             ])
@@ -150,14 +154,32 @@ def create_default_data():
         db.close()
 
 
+def ensure_database_schema():
+    inspector = inspect(engine)
+
+    if inspector.has_table("rooms"):
+        room_columns = {column["name"] for column in inspector.get_columns("rooms")}
+
+        if "is_active" not in room_columns:
+            with engine.begin() as connection:
+                connection.execute(
+                    text("ALTER TABLE rooms ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT 1")
+                )
+                connection.execute(
+                    text("UPDATE rooms SET is_active = 0 WHERE status = 'inactive'")
+                )
+
+
 @app.on_event("startup")
 def startup_event():
     Base.metadata.create_all(bind=engine)
+    ensure_database_schema()
     create_default_data()
 
 
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(rooms.router)
+app.include_router(guests.router)
 app.include_router(notifications.router)
 app.include_router(reminders.router)

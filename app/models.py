@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Float, Integer, String, Text
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
 
 from app.database import Base
 
@@ -29,7 +29,23 @@ class Room(Base):
     capacity = Column(Integer, default=2)
     price_per_night = Column(Float, default=0)
     status = Column(String(50), default="available")
+    is_active = Column(Boolean, default=True, nullable=False)
     note = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Guest(Base):
+    __tablename__ = "guests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    full_name = Column(String(255), nullable=False)
+    phone = Column(String(20), nullable=True)
+    email = Column(String(255), nullable=True)
+    identity_number = Column(String(50), nullable=True)
+    room_id = Column(Integer, nullable=False, index=True)
+    check_in_date = Column(DateTime, nullable=False)
+    check_out_date = Column(DateTime, nullable=True)
+    is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 

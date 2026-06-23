@@ -1,6 +1,6 @@
 from typing import Optional
 
-from app.models import Notification, NotificationRecipient, Reminder, Room, User
+from app.models import Guest, Notification, NotificationRecipient, Reminder, Room, User
 
 
 def api_response(message: str, data=None):
@@ -33,8 +33,25 @@ def room_to_dict(room: Room):
         "capacity": room.capacity,
         "price_per_night": room.price_per_night,
         "status": room.status,
+        "is_active": room.is_active,
         "note": room.note,
         "created_at": room.created_at,
+    }
+
+
+def guest_to_dict(guest: Guest, room: Optional[Room] = None):
+    return {
+        "id": guest.id,
+        "full_name": guest.full_name,
+        "phone": guest.phone,
+        "email": guest.email,
+        "identity_number": guest.identity_number,
+        "room_id": guest.room_id,
+        "room_number": room.room_number if room else None,
+        "check_in_date": guest.check_in_date,
+        "check_out_date": guest.check_out_date,
+        "is_active": guest.is_active,
+        "created_at": guest.created_at,
     }
 
 
