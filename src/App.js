@@ -1,9 +1,11 @@
+import AccountTable from './features/accounts/AccountTable';
+
 function App() {
   return (
-    <div>
-      <h1>Đồ Án Công Nghệ Phần Mềm</h1>
-      <p>Chào mừng nhóm đã bắt đầu!</p>
+    <div className="App">
+      <AccountTable />
     </div>
-  )
+  );
 }
-export default App
+
+export default App;
