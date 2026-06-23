@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-icon sm">H</span>
+            <span>Hotel Reminder</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/ui/guests" class="nav-item">Thông tin khách hàng</a>
+            <a href="/ui/users" class="nav-item active">Phân quyền tài khoản</a>
+            <a href="/docs" class="nav-item" target="_blank">API Docs</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div id="currentUser" class="user-badge"></div>
+            <button id="logoutBtn" class="btn btn-ghost btn-sm">Đăng xuất</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h1>Phân quyền tài khoản</h1>
+                <p class="subtitle">N1-166 — Quản lý nhân viên và vai trò hệ thống</p>
+            </div>
+            <button id="openCreateModal" class="btn btn-primary">+ Tạo tài khoản</button>
+        </header>
+
+        <section class="filters card">
+            <input type="text" id="keyword" placeholder="Tìm theo tên, email, SĐT...">
+            <select id="roleFilter">
+                <option value="">Tất cả vai trò</option>
+                <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
+                <option value="receptionist">Lễ tân</option>
+                <option value="housekeeping">Buồng phòng</option>
+                <option value="technician">Kỹ thuật</option>
+                <option value="staff">Nhân viên</option>
+            </select>
+            <select id="statusFilter">
+                <option value="">Tất cả trạng thái</option>
+                <option value="active">Đang hoạt động</option>
+                <option value="locked">Đã khóa</option>
+            </select>
+            <button id="searchBtn" class="btn btn-secondary">Lọc</button>
+        </section>
+
+        <section class="card">
+            <div id="usersError" class="alert alert-error hidden"></div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Họ tên</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th>Bộ phận</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr><td colspan="7" class="empty">Đang tải...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div id="createModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content card">
+        <div class="modal-header">
+            <h2>Tạo tài khoản nhân viên</h2>
+            <button class="modal-close" type="button">&times;</button>
+        </div>
+        <form id="createUserForm" class="form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Họ tên</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" name="password" minlength="6" required>
+                </div>
+                <div class="form-group">
+                    <label>Vai trò</label>
+                    <select name="role" required>
+                        <option value="staff">Nhân viên</option>
+                        <option value="receptionist">Lễ tân</option>
+                        <option value="housekeeping">Buồng phòng</option>
+                        <option value="technician">Kỹ thuật</option>
+                        <option value="manager">Manager</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Bộ phận</label>
+                    <input type="text" name="department">
+                </div>
+                <div class="form-group">
+                    <label>Số điện thoại</label>
+                    <input type="text" name="phone">
+                </div>
+            </div>
+            <div id="createError" class="alert alert-error hidden"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost modal-close">Hủy</button>
+                <button type="submit" class="btn btn-primary">Tạo tài khoản</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/users.js"></script>
+{% endblock %}
