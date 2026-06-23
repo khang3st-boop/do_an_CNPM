@@ -292,3 +292,5 @@ GET /api/reminders/overdue
 * Giao diện web: `/ui/login`, `/ui/users`, `/ui/guests`
 * Lễ tân (`receptionist`) có thể xem danh sách phòng và quản lý lịch nhắc.
 * Giao diện người dùng có thể được phát triển ở giai đoạn sau.
+t e s t  
+ 
