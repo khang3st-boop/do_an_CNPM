@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý thông báo{% endblock %}
+
+{% block content %}
+<section class="page-title">
+    <h1>Quản lý thông báo</h1>
+</section>
+
+<section class="form-panel">
+    <h2>Tạo thông báo</h2>
+    <form method="post" class="grid-form">
+        <input name="title" placeholder="Tiêu đề" required>
+        <input name="department" placeholder="Bộ phận">
+        <input name="content" placeholder="Nội dung" required>
+        <button type="submit">Tạo thông báo</button>
+    </form>
+</section>
+
+<section class="table-panel">
+    <table>
+        <thead>
+            <tr>
+                <th>Tiêu đề</th>
+                <th>Bộ phận</th>
+                <th>Nội dung</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for notification in notifications %}
+            <tr>
+                <td>{{ notification.title }}</td>
+                <td>{{ notification.department or "" }}</td>
+                <td>{{ notification.content }}</td>
+                <td>{{ notification.status }}</td>
+                <td>
+                    {% if notification.status != "read" %}
+                    <form method="post" action="{{ url_for('notifications.mark_read', notification_id=notification.id) }}">
+                        <button type="submit">Đã đọc</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
+

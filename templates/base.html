@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Hotel Reminder Management System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <div>
+            <strong>Hệ thống quản lý nhắc lịch khách sạn</strong>
+            <span>Hotel Reminder Management System</span>
+        </div>
+        {% if session.get("user_id") %}
+            <nav>
+                <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+                <a href="{{ url_for('users.index') }}">Tài khoản</a>
+                <a href="{{ url_for('rooms.index') }}">Phòng</a>
+                <a href="{{ url_for('guests.index') }}">Khách lưu trú</a>
+                <a href="{{ url_for('reminders.index') }}">Nhắc lịch</a>
+                <a href="{{ url_for('notifications.index') }}">Thông báo</a>
+                <a href="{{ url_for('auth.logout') }}">Đăng xuất</a>
+            </nav>
+        {% endif %}
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <section class="messages">
+                    {% for category, message in messages %}
+                        <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+

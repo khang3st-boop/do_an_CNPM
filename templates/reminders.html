@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý nhắc lịch{% endblock %}
+
+{% block content %}
+<section class="page-title">
+    <h1>Quản lý nhắc lịch</h1>
+</section>
+
+<section class="form-panel">
+    <h2>Tạo lịch nhắc</h2>
+    <form method="post" class="grid-form">
+        <input name="title" placeholder="Tiêu đề" required>
+        <input name="guest_name" placeholder="Tên khách">
+        <select name="room_id">
+            {% for room in rooms %}
+                <option value="{{ room.id }}">Phòng {{ room.room_number }}</option>
+            {% endfor %}
+        </select>
+        <select name="reminder_type">
+            <option value="check-in">check-in</option>
+            <option value="check-out">check-out</option>
+            <option value="general">general</option>
+        </select>
+        <input type="datetime-local" name="reminder_time" required>
+        <input name="content" placeholder="Nội dung">
+        <button type="submit">Tạo lịch nhắc</button>
+    </form>
+</section>
+
+<section class="table-panel">
+    <table>
+        <thead>
+            <tr>
+                <th>Tiêu đề</th>
+                <th>Khách</th>
+                <th>Phòng</th>
+                <th>Thời gian</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reminder in reminders %}
+            <tr>
+                <td>{{ reminder.title }}</td>
+                <td>{{ reminder.guest_name or "" }}</td>
+                <td>{{ room_map.get(reminder.room_id).room_number if room_map.get(reminder.room_id) else "" }}</td>
+                <td>{{ reminder.reminder_time.strftime("%d/%m/%Y %H:%M") }}</td>
+                <td>{{ reminder.status }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('reminders.update_status', reminder_id=reminder.id) }}">
+                        <select name="status">
+                            <option value="pending">pending</option>
+                            <option value="completed">completed</option>
+                            <option value="cancelled">cancelled</option>
+                        </select>
+                        <button type="submit">Cập nhật</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
+

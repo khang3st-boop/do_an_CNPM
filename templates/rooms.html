@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý phòng{% endblock %}
+
+{% block content %}
+<section class="page-title">
+    <h1>Quản lý phòng</h1>
+</section>
+
+<section class="form-panel">
+    <h2>Tạo phòng mới</h2>
+    <form method="post" class="grid-form">
+        <input name="room_number" placeholder="Số phòng" required>
+        <input name="room_type" placeholder="Loại phòng" value="Standard" required>
+        <input type="number" name="floor" placeholder="Tầng" min="0">
+        <input type="number" name="capacity" placeholder="Sức chứa" min="1" value="2">
+        <input type="number" name="price_per_night" placeholder="Giá/đêm" min="0">
+        <select name="status">
+            <option value="available">available</option>
+            <option value="occupied">occupied</option>
+            <option value="maintenance">maintenance</option>
+        </select>
+        <input name="note" placeholder="Ghi chú">
+        <button type="submit">Tạo phòng</button>
+    </form>
+</section>
+
+<section class="table-panel">
+    <table>
+        <thead>
+            <tr>
+                <th>Số phòng</th>
+                <th>Loại</th>
+                <th>Tầng</th>
+                <th>Sức chứa</th>
+                <th>Trạng thái</th>
+                <th>Hoạt động</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for room in rooms %}
+            <tr>
+                <td>{{ room.room_number }}</td>
+                <td>{{ room.room_type }}</td>
+                <td>{{ room.floor }}</td>
+                <td>{{ room.capacity }}</td>
+                <td>{{ room.status }}</td>
+                <td>{{ "Có" if room.is_active else "Không" }}</td>
+                <td>
+                    {% if room.is_active %}
+                    <form method="post" action="{{ url_for('rooms.deactivate', room_id=room.id) }}">
+                        <button type="submit">Vô hiệu hóa</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
+

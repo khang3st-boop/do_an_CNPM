@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý tài khoản{% endblock %}
+
+{% block content %}
+<section class="page-title">
+    <h1>Quản lý tài khoản</h1>
+</section>
+
+<section class="form-panel">
+    <h2>Tạo tài khoản nhân viên</h2>
+    <form method="post" class="grid-form">
+        <input name="full_name" placeholder="Họ tên" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Mật khẩu" required>
+        <input name="phone" placeholder="Số điện thoại">
+        <select name="role">
+            <option value="admin">Admin</option>
+            <option value="manager">Manager</option>
+            <option value="receptionist">Receptionist</option>
+            <option value="housekeeping">Housekeeping</option>
+            <option value="technician">Technician</option>
+            <option value="staff" selected>Staff</option>
+        </select>
+        <button type="submit">Tạo tài khoản</button>
+    </form>
+</section>
+
+<section class="table-panel">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.full_name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+                <td>{{ user.status }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('users.toggle_status', user_id=user.id) }}">
+                        <button type="submit">Khóa/Mở khóa</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
+

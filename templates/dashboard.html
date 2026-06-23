@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-title">
+    <h1>Tổng quan</h1>
+    <p>Xin chào {{ session.get("user_name") }}.</p>
+</section>
+
+<section class="stats-grid">
+    <article><strong>{{ stats.users }}</strong><span>Tài khoản</span></article>
+    <article><strong>{{ stats.rooms }}</strong><span>Phòng hoạt động</span></article>
+    <article><strong>{{ stats.guests }}</strong><span>Khách lưu trú</span></article>
+    <article><strong>{{ stats.pending_reminders }}</strong><span>Lịch nhắc chờ xử lý</span></article>
+    <article><strong>{{ stats.overdue_reminders }}</strong><span>Lịch nhắc quá hạn</span></article>
+    <article><strong>{{ stats.notifications }}</strong><span>Thông báo</span></article>
+</section>
+{% endblock %}
+

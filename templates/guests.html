@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý khách lưu trú{% endblock %}
+
+{% block content %}
+<section class="page-title">
+    <h1>Quản lý khách lưu trú</h1>
+</section>
+
+<section class="form-panel">
+    <h2>Thêm khách lưu trú</h2>
+    <form method="post" class="grid-form">
+        <input name="full_name" placeholder="Họ tên" required>
+        <input name="phone" placeholder="Số điện thoại">
+        <input type="email" name="email" placeholder="Email">
+        <input name="identity_number" placeholder="CCCD/CMND">
+        <select name="room_id" required>
+            {% for room in rooms %}
+                <option value="{{ room.id }}">Phòng {{ room.room_number }}</option>
+            {% endfor %}
+        </select>
+        <input type="datetime-local" name="check_in_date" required>
+        <input type="datetime-local" name="check_out_date">
+        <button type="submit">Lưu khách</button>
+    </form>
+</section>
+
+<section class="table-panel">
+    <table>
+        <thead>
+            <tr>
+                <th>Họ tên</th>
+                <th>Điện thoại</th>
+                <th>Phòng</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Hoạt động</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for guest in guests %}
+            <tr>
+                <td>{{ guest.full_name }}</td>
+                <td>{{ guest.phone or "" }}</td>
+                <td>{{ room_map.get(guest.room_id).room_number if room_map.get(guest.room_id) else guest.room_id }}</td>
+                <td>{{ guest.check_in_date.strftime("%d/%m/%Y %H:%M") }}</td>
+                <td>{{ guest.check_out_date.strftime("%d/%m/%Y %H:%M") if guest.check_out_date else "" }}</td>
+                <td>{{ "Có" if guest.is_active else "Không" }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('guests.toggle_status', guest_id=guest.id) }}">
+                        <button type="submit">Đổi trạng thái</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
+
