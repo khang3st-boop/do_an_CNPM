@@ -84,3 +84,14 @@ def reminder_to_dict(
         "created_by": reminder.created_by,
         "created_at": reminder.created_at,
     }
+
+def maintenance_result_to_dict(result):
+    return {
+        "id": result.id,
+        "room_id": result.room_id,
+        "title": result.title,
+        "description": result.description,
+        "result": result.result,
+        "status": result.status,
+        "created_at": result.created_at,
+    }

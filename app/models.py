@@ -71,3 +71,13 @@ class Reminder(Base):
     status = Column(String(50), default="pending")
     created_by = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class MaintenanceResult(Base):
+    __tablename__ = "maintenance_results"
+    id = Column(Integer, primary_key=True, index=True)
+    room_id = Column(Integer, nullable=False, index=True)
+    title = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    result = Column(String(50), nullable=False)
+    status = Column(String(50), default="active")
+    created_at = Column(DateTime, default=datetime.utcnow)
