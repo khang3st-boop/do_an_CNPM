@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Thông báo nội bộ{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h4><i class="bi bi-chat-dots text-primary"></i> Thông báo nội bộ</h4><a href="{{ url_for('internal_notif.create_notification') }}" class="btn btn-primary"><i class="bi bi-send me-1"></i> Gửi thông báo</a></div>
+<div class="card shadow-sm"><div class="card-body p-0">
+{% if notifications %}<div class="list-group list-group-flush">
+{% for n in notifications %}
+<div class="list-group-item">
+    <div class="d-flex justify-content-between align-items-start gap-3">
+        <div><h6 class="mb-1">{{ n.Title }} <span class="badge bg-{{ {'low':'secondary','normal':'primary','high':'warning text-dark','urgent':'danger'}.get(n.Priority,'secondary') }}">{{ n.Priority }}</span></h6>
+        <p class="mb-1 text-muted">{{ n.Content }}</p>
+        <small>Từ: {{ n.sender.Username if n.sender else '—' }} → {{ n.receiver.Username if n.receiver else 'Tất cả' }} · {{ n.CreatedAt.strftime('%d/%m/%Y %H:%M') }}</small></div>
+        <form method="POST" action="{{ url_for('internal_notif.delete_notification', notif_id=n.NotifID) }}" onsubmit="return confirm('Xóa thông báo này?')"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+    </div>
+</div>
+{% endfor %}</div>{% else %}<div class="text-center text-muted py-5"><i class="bi bi-inbox fs-1"></i><p class="mt-2">Chưa có thông báo nội bộ.</p></div>{% endif %}
+</div></div>
+{% endblock %}

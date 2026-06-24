@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ action }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-7"><div class="card shadow-sm">
+<div class="card-header bg-white fw-bold"><i class="bi bi-calendar-plus text-primary"></i> {{ action }}</div>
+<div class="card-body"><form method="POST">
+    {% if not booking %}
+    <div class="mb-3"><label class="form-label fw-semibold">Khách hàng <span class="text-danger">*</span></label><select name="guest_id" class="form-select" required><option value="">-- Chọn khách --</option>{% for g in guests %}<option value="{{ g.GuestID }}">{{ g.FullName }} - {{ g.Phone }}</option>{% endfor %}</select></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Phòng trống <span class="text-danger">*</span></label><select name="room_id" class="form-select" required><option value="">-- Chọn phòng --</option>{% for r in rooms %}<option value="{{ r.RoomID }}">Phòng {{ r.RoomNumber }} - {{ r.RoomType }} - Tầng {{ r.Floor }}</option>{% endfor %}</select></div>
+    {% else %}
+    <div class="alert alert-info">Đặt phòng #{{ booking.BookingID }} — {{ booking.guest.FullName if booking.guest else 'Khách' }} / Phòng {{ booking.room.RoomNumber if booking.room else '—' }}</div>
+    {% endif %}
+    <div class="row"><div class="col-md-6 mb-3"><label class="form-label fw-semibold">Ngày nhận phòng <span class="text-danger">*</span></label><input type="datetime-local" name="check_in" class="form-control" value="{{ booking.CheckIn.strftime('%Y-%m-%dT%H:%M') if booking else '' }}" required></div>
+    <div class="col-md-6 mb-3"><label class="form-label fw-semibold">Ngày trả phòng <span class="text-danger">*</span></label><input type="datetime-local" name="check_out" class="form-control" value="{{ booking.CheckOut.strftime('%Y-%m-%dT%H:%M') if booking else '' }}" required></div></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Tổng tiền</label><input type="number" step="1000" min="0" name="total_price" class="form-control" value="{{ booking.TotalPrice if booking else 0 }}"></div>
+    <div class="mb-4"><label class="form-label fw-semibold">Ghi chú</label><textarea name="notes" class="form-control" rows="3">{{ booking.Notes if booking else '' }}</textarea></div>
+    <div class="d-flex gap-2"><button class="btn btn-primary"><i class="bi bi-check-circle me-1"></i> {{ action }}</button><a href="{{ url_for('guest.list_bookings') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Quay lại</a></div>
+</form></div></div></div></div>
+{% endblock %}

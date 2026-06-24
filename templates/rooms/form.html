@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ action }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold">
+                <i class="bi bi-door-open text-primary"></i> {{ action }}
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Số phòng <span class="text-danger">*</span></label>
+                        <input type="text" name="room_number" class="form-control"
+                               placeholder="VD: 101, A205"
+                               value="{{ room.RoomNumber if room else '' }}"
+                               {{ 'readonly' if room else '' }} required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Loại phòng <span class="text-danger">*</span></label>
+                        <select name="room_type" class="form-select">
+                            {% for t in valid_types %}
+                            <option value="{{ t }}" {{ 'selected' if room and room.RoomType == t }}>{{ t }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tầng <span class="text-danger">*</span></label>
+                        <input type="number" name="floor" class="form-control" min="1"
+                               value="{{ room.Floor if room else 1 }}" required>
+                    </div>
+                    {% if room %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Trạng thái</label>
+                        <select name="status" class="form-select">
+                            {% for s in valid_statuses %}
+                            <option value="{{ s }}" {{ 'selected' if room.Status == s }}>{{ s | capitalize }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Mô tả</label>
+                        <textarea name="description" class="form-control" rows="2">{{ room.Description if room else '' }}</textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i> {{ action }}</button>
+                        <a href="{{ url_for('room.list_rooms') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Quay lại</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

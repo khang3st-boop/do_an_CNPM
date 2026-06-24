@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ action }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold">
+                <i class="bi bi-person-fill text-primary"></i> {{ action }}
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% if not user %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tên đăng nhập <span class="text-danger">*</span></label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mật khẩu <span class="text-danger">*</span></label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    {% else %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tên đăng nhập</label>
+                        <input type="text" class="form-control" value="{{ user.Username }}" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mật khẩu mới <span class="text-muted small">(để trống nếu không đổi)</span></label>
+                        <input type="password" name="new_password" class="form-control">
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ user.Email if user else '' }}">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Vai trò</label>
+                        <select name="role" class="form-select">
+                            <option value="staff"   {% if user and user.Role == 'staff'   %}selected{% endif %}>Staff</option>
+                            <option value="manager" {% if user and user.Role == 'manager' %}selected{% endif %}>Manager</option>
+                            <option value="admin"   {% if user and user.Role == 'admin'   %}selected{% endif %}>Admin</option>
+                        </select>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i> {{ action }}</button>
+                        <a href="{{ url_for('user.list_users') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Quay lại</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Thông báo khách hàng{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h4><i class="bi bi-envelope-paper text-primary"></i> Thông báo cho khách hàng</h4><a href="{{ url_for('guest_notif.create_notification') }}" class="btn btn-primary"><i class="bi bi-send me-1"></i> Gửi thông báo</a></div>
+<div class="card shadow-sm"><div class="card-body p-0">
+{% if notifications %}<table class="table table-hover mb-0"><thead class="table-primary"><tr><th>Tiêu đề</th><th>Khách / Phòng</th><th>Kênh</th><th>Trạng thái</th><th>Thời gian</th><th class="text-center">Thao tác</th></tr></thead><tbody>
+{% for n in notifications %}
+<tr>
+    <td><div class="fw-semibold">{{ n.Subject }}</div><small class="text-muted">{{ n.Content[:80] }}{{ '...' if n.Content|length > 80 }}</small></td>
+    <td>{{ n.booking.guest.FullName if n.booking and n.booking.guest else '—' }}<br><small class="text-muted">Phòng {{ n.booking.room.RoomNumber if n.booking and n.booking.room else '—' }}</small></td>
+    <td><span class="badge bg-secondary">{{ n.Channel }}</span></td>
+    <td><span class="badge bg-{{ 'success' if n.Status == 'sent' else ('warning text-dark' if n.Status == 'draft' else 'danger') }}">{{ n.Status }}</span></td>
+    <td>{{ n.SentAt.strftime('%d/%m/%Y %H:%M') }}</td>
+    <td class="text-center">{% if session.role in ('admin','manager') %}<form method="POST" action="{{ url_for('guest_notif.delete_notification', notif_id=n.GuestNotifID) }}" onsubmit="return confirm('Xóa thông báo này?')"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>{% endif %}</td>
+</tr>
+{% endfor %}</tbody></table>{% else %}<div class="text-center text-muted py-5"><i class="bi bi-envelope-x fs-1"></i><p class="mt-2">Chưa có thông báo cho khách.</p></div>{% endif %}
+</div></div>
+{% endblock %}

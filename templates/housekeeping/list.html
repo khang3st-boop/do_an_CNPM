@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Dọn phòng / Bảo trì{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-tools text-primary"></i> Lịch dọn phòng & bảo trì</h4>
+    {% if session.role in ('admin','manager') %}<a href="{{ url_for('housekeeping.create_task') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> Tạo công việc</a>{% endif %}
+</div>
+<div class="mb-3 d-flex gap-2 flex-wrap">
+    <a href="{{ url_for('housekeeping.list_tasks') }}" class="btn btn-sm {{ 'btn-primary' if not status_filter else 'btn-outline-secondary' }}">Tất cả</a>
+    {% set labels={'pending':'Chờ xử lý','in_progress':'Đang làm','done':'Hoàn thành','cancelled':'Đã huỷ'} %}
+    {% for s in valid_statuses %}<a href="{{ url_for('housekeeping.list_tasks', status=s) }}" class="btn btn-sm {{ 'btn-primary' if status_filter == s else 'btn-outline-secondary' }}">{{ labels.get(s,s) }} <span class="badge bg-light text-dark">{{ counts.get(s,0) }}</span></a>{% endfor %}
+</div>
+<div class="card shadow-sm"><div class="card-body p-0">
+{% if tasks %}
+<table class="table table-hover mb-0"><thead class="table-primary"><tr><th>#</th><th>Phòng</th><th>Loại</th><th>Người phụ trách</th><th>Lịch làm</th><th>Ưu tiên</th><th>Trạng thái</th><th class="text-center">Thao tác</th></tr></thead><tbody>
+{% set type_labels={'cleaning':'Dọn phòng','maintenance':'Bảo trì','inspection':'Kiểm tra','setup':'Setup'} %}
+{% set pr_labels={'low':'Thấp','normal':'Bình thường','high':'Cao','urgent':'Khẩn cấp'} %}
+{% for t in tasks %}
+<tr>
+<td>{{ t.TaskID }}</td>
+<td class="fw-semibold">{{ t.room.RoomNumber if t.room else '—' }}</td>
+<td>{{ type_labels.get(t.TaskType,t.TaskType) }}</td>
+<td>{{ t.assigned_to.Username if t.assigned_to else 'Chưa giao' }}</td>
+<td>{{ t.ScheduledAt.strftime('%d/%m/%Y %H:%M') }}</td>
+<td><span class="badge bg-{{ 'danger' if t.Priority == 'urgent' else ('warning text-dark' if t.Priority == 'high' else 'secondary') }}">{{ pr_labels.get(t.Priority,t.Priority) }}</span></td>
+<td><span class="badge bg-{{ {'pending':'warning text-dark','in_progress':'info','done':'success','cancelled':'danger'}.get(t.Status,'secondary') }}">{{ labels.get(t.Status,t.Status) }}</span></td>
+<td class="text-center">
+    <form class="d-inline" method="POST" action="{{ url_for('housekeeping.update_task_status', task_id=t.TaskID) }}">
+        <select class="form-select form-select-sm d-inline-block w-auto" name="status" onchange="this.form.submit()">{% for s in valid_statuses %}<option value="{{ s }}" {{ 'selected' if t.Status == s }}>{{ labels.get(s,s) }}</option>{% endfor %}</select>
+    </form>
+    {% if session.role in ('admin','manager') %}
+    <a class="btn btn-sm btn-outline-primary mx-1" href="{{ url_for('housekeeping.edit_task', task_id=t.TaskID) }}"><i class="bi bi-pencil"></i></a>
+    <form class="d-inline" method="POST" action="{{ url_for('housekeeping.delete_task', task_id=t.TaskID) }}" onsubmit="return confirm('Xóa công việc này?')"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+    {% endif %}
+</td>
+</tr>
+{% endfor %}</tbody></table>
+{% else %}<div class="text-center text-muted py-5"><i class="bi bi-check2-square fs-1"></i><p class="mt-2">Chưa có công việc nào.</p></div>{% endif %}
+</div></div>
+{% endblock %}

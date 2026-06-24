@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ action }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-7">
+<div class="card shadow-sm"><div class="card-header bg-white fw-bold"><i class="bi bi-person-plus text-primary"></i> {{ action }}</div>
+<div class="card-body"><form method="POST">
+    <div class="mb-3"><label class="form-label fw-semibold">Họ tên <span class="text-danger">*</span></label><input class="form-control" name="full_name" value="{{ guest.FullName if guest else '' }}" required></div>
+    <div class="row"><div class="col-md-6 mb-3"><label class="form-label fw-semibold">CMND/CCCD <span class="text-danger">*</span></label><input class="form-control" name="id_card" value="{{ guest.IDCard if guest else '' }}" required></div>
+    <div class="col-md-6 mb-3"><label class="form-label fw-semibold">Số điện thoại <span class="text-danger">*</span></label><input class="form-control" name="phone" value="{{ guest.Phone if guest else '' }}" required></div></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Email</label><input type="email" class="form-control" name="email" value="{{ guest.Email if guest else '' }}"></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Địa chỉ</label><textarea class="form-control" name="address" rows="2">{{ guest.Address if guest else '' }}</textarea></div>
+    <div class="mb-4"><label class="form-label fw-semibold">Quốc tịch</label><input class="form-control" name="nationality" value="{{ guest.Nationality if guest else 'Việt Nam' }}"></div>
+    <div class="d-flex gap-2"><button class="btn btn-primary"><i class="bi bi-check-circle me-1"></i> {{ action }}</button><a class="btn btn-outline-secondary" href="{{ url_for('guest.list_guests') }}"><i class="bi bi-arrow-left me-1"></i> Quay lại</a></div>
+</form></div></div></div></div>
+{% endblock %}

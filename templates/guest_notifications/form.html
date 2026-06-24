@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Gửi thông báo khách hàng{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-7"><div class="card shadow-sm">
+<div class="card-header bg-white fw-bold"><i class="bi bi-envelope-paper text-primary"></i> Gửi thông báo cho khách hàng</div>
+<div class="card-body"><form method="POST">
+    <div class="mb-3"><label class="form-label fw-semibold">Đặt phòng <span class="text-danger">*</span></label><select name="booking_id" class="form-select" required><option value="">-- Chọn đặt phòng --</option>{% for b in bookings %}<option value="{{ b.BookingID }}">#{{ b.BookingID }} - {{ b.guest.FullName if b.guest else 'Khách' }} - Phòng {{ b.room.RoomNumber if b.room else '—' }}</option>{% endfor %}</select></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Tiêu đề <span class="text-danger">*</span></label><input name="subject" class="form-control" required></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Nội dung <span class="text-danger">*</span></label><textarea name="content" rows="4" class="form-control" required></textarea></div>
+    <div class="mb-4"><label class="form-label fw-semibold">Kênh gửi</label><select name="channel" class="form-select">{% for c in channels %}<option value="{{ c }}">{{ c }}</option>{% endfor %}</select></div>
+    <div class="d-flex gap-2"><button class="btn btn-primary"><i class="bi bi-send me-1"></i> Gửi</button><a class="btn btn-outline-secondary" href="{{ url_for('guest_notif.list_notifications') }}"><i class="bi bi-arrow-left me-1"></i> Quay lại</a></div>
+</form></div></div></div></div>
+{% endblock %}
