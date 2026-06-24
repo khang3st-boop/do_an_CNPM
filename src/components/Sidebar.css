@@ -1,0 +1,45 @@
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background-color: #0b0e1f;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.sidebar-brand { margin-bottom: 30px; padding-left: 10px; }
+.sidebar-brand h2 { font-size: 1.2rem; margin: 0; }
+.sidebar-brand p { font-size: 0.8rem; color: #64748b; }
+
+.nav-item {
+  display: block;
+  padding: 12px 15px;
+  color: #94a3b8; /* Màu nhạt mặc định */
+  text-decoration: none;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  transition: 0.2s;
+}
+
+.nav-item:hover { background: #1e293b; color: white; }
+
+/* Chỉ mục đang chọn mới đổi màu và đậm */
+.nav-item.active { 
+  background: #6366f1; 
+  color: white; 
+  font-weight: 500; 
+}
+
+.sidebar-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid #1e293b; }
+
+.btn-auth {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.btn-auth.login { background: #22c55e; color: white; }
+.btn-auth.logout { background: #ef4444; color: white; }

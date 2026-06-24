@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 const AccountTable = () => {
   const [accounts, setAccounts] = useState([]);
@@ -17,13 +17,13 @@ const AccountTable = () => {
   });
   const [formError, setFormError] = useState('');
 
-  // Hàm gọi API lấy danh sách (Chạy lại khi bộ lọc thay đổi)
-  const fetchAccounts = async () => {
+  // Hàm gọi API lấy danh sách (Bọc bằng useCallback để tránh render thừa)
+  const fetchAccounts = useCallback(async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      // Xây dựng Query Parameters dựa trên Backend FastAPI hỗ trợ
+      // Xây dựng Query Parameters dựa trên Backend hỗ trợ
       let url = 'http://localhost:8000/api/users?';
       if (keyword) url += `keyword=${encodeURIComponent(keyword)}&`;
       if (roleFilter) url += `role=${roleFilter}&`;
@@ -50,13 +50,14 @@ const AccountTable = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [keyword, roleFilter, statusFilter]); // Tự động cập nhật tham số truy vấn mới nhất
 
+  // Chạy lại mỗi khi ô tìm kiếm hoặc bộ lọc thay đổi dữ liệu
   useEffect(() => {
     fetchAccounts();
-  }, [roleFilter, statusFilter]); // Tự động gọi lại khi chọn bộ lọc
+  }, [fetchAccounts]); 
 
-  // Hàm xử lý Tìm kiếm khi bấm nút hoặc nhấn Enter
+  // Hàm xử lý Tìm kiếm (Giờ chỉ cần kích hoạt fetchAccounts trực tiếp)
   const handleSearch = (e) => {
     e.preventDefault();
     fetchAccounts();
@@ -74,8 +75,10 @@ const AccountTable = () => {
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || 'Cập nhật thất bại');
       
-      // Cập nhật mượt mà trạng thái trên giao diện không cần tải lại trang
-      setAccounts(accounts.map(acc => acc.id === userId ? { ...acc, status: result.data.status } : acc));
+      // Đồng bộ trạng thái mới từ API trả về (active / locked)
+      setAccounts(prevAccounts => 
+        prevAccounts.map(acc => acc.id === userId ? { ...acc, status: result.data.status } : acc)
+      );
     } catch (err) {
       alert(`⚠️ Lỗi: ${err.message}`);
     }
@@ -101,7 +104,7 @@ const AccountTable = () => {
 
       setIsModalOpen(false); // Đóng modal
       setFormData({ name: '', email: '', password: '', role: 'receptionist', department: 'reception', phone: '' }); // Reset form
-      fetchAccounts(); // Cập nhật lại bảng dữ liệu
+      fetchAccounts(); // Làm mới lại danh sách hiển thị
     } catch (err) {
       setFormError(err.message);
     }
