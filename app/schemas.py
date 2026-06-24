@@ -12,6 +12,11 @@ ALLOWED_NOTIFICATION_STATUSES = ["active", "inactive"]
 ALLOWED_RECIPIENT_STATUSES = ["unread", "read"]
 ALLOWED_REMINDER_TYPES = ["check-in", "check-out"]
 ALLOWED_REMINDER_STATUSES = ["pending", "in_progress", "completed", "cancelled"]
+ALLOWED_MAINTENANCE_RESULTS = [
+    "completed",
+    "failed",
+    "pending"
+]
 
 
 class LoginRequest(BaseModel):
@@ -200,4 +205,33 @@ class ReminderStatusRequest(BaseModel):
         value = value.strip().lower()
         if value not in ALLOWED_REMINDER_STATUSES:
             raise ValueError("Trạng thái lịch nhắc không hợp lệ")
+        return value
+
+class MaintenanceResultUpdateRequest(BaseModel):
+    title: str = Field(..., min_length=2, max_length=255)
+    description: Optional[str] = None
+    result: str
+
+    @field_validator("title", mode="before")
+    @classmethod
+    def strip_title(cls, value):
+        if isinstance(value, str):
+            return value.strip()
+        return value
+
+    @field_validator("description", mode="before")
+    @classmethod
+    def strip_description(cls, value):
+        if isinstance(value, str):
+            value = value.strip()
+        return value or None
+
+    @field_validator("result")
+    @classmethod
+    def validate_result(cls, value):
+        value = value.strip().lower()
+
+        if value not in ALLOWED_MAINTENANCE_RESULTS:
+            raise ValueError("Kết quả bảo trì không hợp lệ")
+
         return value
