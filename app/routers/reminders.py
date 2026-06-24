@@ -14,7 +14,7 @@ from app.schemas import (
     ReminderStatusRequest,
 )
 from app.utils import api_response, reminder_to_dict
-
+from datetime import datetime
 
 router = APIRouter(prefix="/api/reminders", tags=["reminders"])
 
@@ -185,3 +185,23 @@ def update_reminder_status(
         "Cập nhật trạng thái lịch nhắc thành công",
         reminder_to_dict(reminder, room=room, assigned_user=assigned_user),
     )
+
+@router.get("/overdue")
+def get_overdue_reminders(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_room_viewer),
+):
+    overdue_tasks = (
+        db.query(Reminder)
+        .filter(
+            Reminder.due_date < datetime.utcnow(),
+            Reminder.status != "completed"
+        )
+        .order_by(Reminder.due_date.asc())
+        .all()
+    )
+
+    return api_response(
+    "Lấy danh sách công việc quá hạn thành công",
+    [overdue_task_to_dict(task) for task in overdue_tasks]
+)

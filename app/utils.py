@@ -84,3 +84,13 @@ def reminder_to_dict(
         "created_by": reminder.created_by,
         "created_at": reminder.created_at,
     }
+
+def overdue_task_to_dict(task):
+    return {
+        "id": task.id,
+        "title": task.title,
+        "description": task.description,
+        "room_id": task.room_id,
+        "status": task.status,
+        "due_date": task.due_date,
+    }
