@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Gui thong bao noi bo{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-7"><div class="card shadow-sm">
+<div class="card-header bg-white fw-bold"><i class="bi bi-send text-primary"></i> Gui thong bao noi bo</div>
+<div class="card-body"><form method="POST">
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Doi tuong nhan</label>
+        <select name="target_type" class="form-select" id="targetType">
+            <option value="all">Tat ca nhan vien</option>
+            <option value="department">Theo bo phan</option>
+            <option value="user">Mot nhan vien</option>
+        </select>
+    </div>
+    <div class="mb-3" id="departmentTarget">
+        <label class="form-label fw-semibold">Bo phan</label>
+        <select name="to_department" class="form-select">
+            {% for d in departments %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="mb-3" id="userTarget">
+        <label class="form-label fw-semibold">Nhan vien</label>
+        <select name="to_user_id" class="form-select">
+            <option value="">-- Chon nhan vien --</option>
+            {% for u in users %}
+            <option value="{{ u.UserID }}">{{ u.Username }} ({{ u.Role }} / {{ u.Department or 'general' }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3"><label class="form-label fw-semibold">Tieu de <span class="text-danger">*</span></label><input name="title" class="form-control" required></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Noi dung <span class="text-danger">*</span></label><textarea name="content" rows="4" class="form-control" required></textarea></div>
+    <div class="mb-4"><label class="form-label fw-semibold">Muc do</label><select name="priority" class="form-select">{% for p in priorities %}<option value="{{ p }}">{{ p }}</option>{% endfor %}</select></div>
+    <div class="d-flex gap-2"><button class="btn btn-primary"><i class="bi bi-send me-1"></i> Gui</button><a class="btn btn-outline-secondary" href="{{ url_for('internal_notif.list_notifications') }}"><i class="bi bi-arrow-left me-1"></i> Quay lai</a></div>
+</form></div></div></div></div>
+<script>
+function syncTargetFields(){
+    const type = document.getElementById('targetType').value;
+    document.getElementById('departmentTarget').style.display = type === 'department' ? '' : 'none';
+    document.getElementById('userTarget').style.display = type === 'user' ? '' : 'none';
+}
+document.getElementById('targetType').addEventListener('change', syncTargetFields);
+syncTargetFields();
+</script>
+{% endblock %}

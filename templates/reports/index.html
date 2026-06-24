@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Bao cao thong ke{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h4><i class="bi bi-bar-chart-fill text-primary"></i> Bao cao thong ke he thong</h4></div>
+<div class="row g-3 mb-4">
+    <div class="col-md-2"><div class="card border-primary"><div class="card-body text-center"><h3 class="text-primary">{{ summary.total_rooms }}</h3><p class="mb-0 text-muted">Phong</p></div></div></div>
+    <div class="col-md-2"><div class="card border-success"><div class="card-body text-center"><h3 class="text-success">{{ summary.total_guests }}</h3><p class="mb-0 text-muted">Khach</p></div></div></div>
+    <div class="col-md-2"><div class="card border-info"><div class="card-body text-center"><h3 class="text-info">{{ summary.total_bookings }}</h3><p class="mb-0 text-muted">Booking</p></div></div></div>
+    <div class="col-md-2"><div class="card border-warning"><div class="card-body text-center"><h3 class="text-warning">{{ summary.total_tasks }}</h3><p class="mb-0 text-muted">Cong viec</p></div></div></div>
+    <div class="col-md-2"><div class="card border-danger"><div class="card-body text-center"><h3 class="text-danger">{{ summary.overdue_tasks }}</h3><p class="mb-0 text-muted">Qua han</p></div></div></div>
+    <div class="col-md-2"><div class="card border-secondary"><div class="card-body text-center"><h3 class="text-secondary">{{ summary.total_users }}</h3><p class="mb-0 text-muted">Nhan vien</p></div></div></div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="card border-danger"><div class="card-body text-center"><h3 class="text-danger">{{ summary.total_reminders }}</h3><p class="mb-0 text-muted">Lich nhac</p></div></div></div>
+    <div class="col-md-4"><div class="card border-primary"><div class="card-body text-center"><h3 class="text-primary">{{ summary.total_internal_notifications }}</h3><p class="mb-0 text-muted">Thong bao noi bo</p></div></div></div>
+    <div class="col-md-4"><div class="card border-success"><div class="card-body text-center"><h3 class="text-success">{{ summary.total_guest_notifications }}</h3><p class="mb-0 text-muted">Thong bao khach</p></div></div></div>
+</div>
+<div class="row g-3">
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-header bg-white fw-bold">Phong theo trang thai</div><div class="card-body">{% for k,v in summary.room_status.items() %}<div class="d-flex justify-content-between border-bottom py-2"><span>{{ k }}</span><strong>{{ v }}</strong></div>{% else %}<p class="text-muted">Chua co du lieu.</p>{% endfor %}</div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-header bg-white fw-bold">Booking theo trang thai</div><div class="card-body">{% for k,v in summary.booking_status.items() %}<div class="d-flex justify-content-between border-bottom py-2"><span>{{ k }}</span><strong>{{ v }}</strong></div>{% else %}<p class="text-muted">Chua co du lieu.</p>{% endfor %}</div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-header bg-white fw-bold">Cong viec theo trang thai</div><div class="card-body">{% for k,v in summary.task_status.items() %}<div class="d-flex justify-content-between border-bottom py-2"><span>{{ k }}</span><strong>{{ v }}</strong></div>{% else %}<p class="text-muted">Chua co du lieu.</p>{% endfor %}</div></div></div>
+</div>
+<div class="row g-3 mt-1">
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-header bg-white fw-bold">Lich nhac theo trang thai</div><div class="card-body">{% for k,v in summary.reminder_status.items() %}<div class="d-flex justify-content-between border-bottom py-2"><span>{{ k }}</span><strong>{{ v }}</strong></div>{% else %}<p class="text-muted">Chua co du lieu.</p>{% endfor %}</div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-header bg-white fw-bold">Thong bao khach theo kenh</div><div class="card-body">{% for k,v in summary.guest_notif_channel.items() %}<div class="d-flex justify-content-between border-bottom py-2"><span>{{ k }}</span><strong>{{ v }}</strong></div>{% else %}<p class="text-muted">Chua co du lieu.</p>{% endfor %}</div></div></div>
+    <div class="col-md-4"><div class="card shadow-sm"><div class="card-header bg-white fw-bold">Thong bao khach theo trang thai</div><div class="card-body">{% for k,v in summary.guest_notif_status.items() %}<div class="d-flex justify-content-between border-bottom py-2"><span>{{ k }}</span><strong>{{ v }}</strong></div>{% else %}<p class="text-muted">Chua co du lieu.</p>{% endfor %}</div></div></div>
+</div>
+<div class="row g-3 mt-1">
+    <div class="col-md-6"><div class="card shadow-sm"><div class="card-header bg-white fw-bold">Top phong duoc dat</div><div class="card-body p-0"><table class="table mb-0"><thead><tr><th>Phong</th><th>So luot</th></tr></thead><tbody>{% for item in summary.top_rooms %}<tr><td>{{ item.room.RoomNumber }}</td><td>{{ item.count }}</td></tr>{% else %}<tr><td colspan="2" class="text-muted text-center py-4">Chua co du lieu.</td></tr>{% endfor %}</tbody></table></div></div></div>
+    <div class="col-md-6"><div class="card shadow-sm"><div class="card-header bg-white fw-bold">Booking gan day</div><div class="card-body p-0"><table class="table mb-0"><thead><tr><th>#</th><th>Khach</th><th>Phong</th><th>Trang thai</th></tr></thead><tbody>{% for b in summary.recent_bookings %}<tr><td>{{ b.BookingID }}</td><td>{{ b.guest.FullName if b.guest else '-' }}</td><td>{{ b.room.RoomNumber if b.room else '-' }}</td><td>{{ b.Status }}</td></tr>{% else %}<tr><td colspan="4" class="text-muted text-center py-4">Chua co du lieu.</td></tr>{% endfor %}</tbody></table></div></div></div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} lịch nhắc{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold">
+                <i class="bi bi-calendar-plus text-primary"></i>
+                {{ action }} lịch nhắc
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tiêu đề <span class="text-danger">*</span></label>
+                            <input type="text" name="title" class="form-control"
+                                   placeholder="VD: Kiểm tra phòng VIP 101"
+                                   value="{{ reminder.Title if reminder else '' }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Loại lịch nhắc</label>
+                            <select name="reminder_type" class="form-select">
+                                <option value="custom" {% if reminder and reminder.ReminderType == 'custom' %}selected{% endif %}>Tuỳ chỉnh</option>
+                                <option value="checkin" {% if reminder and reminder.ReminderType == 'checkin' %}selected{% endif %}>Check-in</option>
+                                <option value="checkout" {% if reminder and reminder.ReminderType == 'checkout' %}selected{% endif %}>Check-out</option>
+                                <option value="cleaning" {% if reminder and reminder.ReminderType == 'cleaning' %}selected{% endif %}>Dọn phòng</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Liên kết với đặt phòng</label>
+                        <select name="booking_id" class="form-select">
+                            <option value="">-- Không liên kết --</option>
+                            {% for b in bookings %}
+                            <option value="{{ b.BookingID }}" {% if reminder and reminder.BookingID == b.BookingID %}selected{% endif %}>
+                                Phòng {{ b.room.RoomNumber }} - Khách: {{ b.guest.FullName }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mô tả</label>
+                        <textarea name="description" class="form-control" rows="3"
+                                  placeholder="Chi tiết thêm về lịch nhắc...">{{ reminder.Description if reminder else '' }}</textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Thời gian nhắc <span class="text-danger">*</span></label>
+                        <input type="datetime-local" name="reminder_time" class="form-control"
+                               value="{{ reminder.ReminderTime.strftime('%Y-%m-%dT%H:%M') if reminder else '' }}"
+                               required>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-1"></i> {{ action }}
+                        </button>
+                        <a href="{{ url_for('reminder.list_reminders') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Quay lại
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

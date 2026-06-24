@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ action }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-7"><div class="card shadow-sm">
+<div class="card-header bg-white fw-bold"><i class="bi bi-tools text-primary"></i> {{ action }}</div>
+<div class="card-body"><form method="POST">
+    <div class="mb-3"><label class="form-label fw-semibold">Phong <span class="text-danger">*</span></label><select class="form-select" name="room_id" required><option value="">-- Chon phong --</option>{% for r in rooms %}<option value="{{ r.RoomID }}" {{ 'selected' if task and task.RoomID == r.RoomID }}>Phong {{ r.RoomNumber }} - {{ r.RoomType }}</option>{% endfor %}</select></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Giao cho</label><select class="form-select" name="assigned_to_id"><option value="">-- Chua giao --</option>{% for u in staff %}<option value="{{ u.UserID }}" {{ 'selected' if task and task.AssignedToID == u.UserID }}>{{ u.Username }} ({{ u.Role }} / {{ u.Department or 'general' }})</option>{% endfor %}</select></div>
+    {% set type_labels={'cleaning':'Don phong','maintenance':'Bao tri','inspection':'Kiem tra','setup':'Setup'} %}
+    <div class="row"><div class="col-md-6 mb-3"><label class="form-label fw-semibold">Loai cong viec</label><select name="task_type" class="form-select">{% for t in task_types %}<option value="{{ t }}" {{ 'selected' if task and task.TaskType == t }}>{{ type_labels.get(t,t) }}</option>{% endfor %}</select></div>
+    <div class="col-md-6 mb-3"><label class="form-label fw-semibold">Uu tien</label><select name="priority" class="form-select">{% for p in priorities %}<option value="{{ p }}" {{ 'selected' if task and task.Priority == p }}>{{ p }}</option>{% endfor %}</select></div></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Thoi gian thuc hien <span class="text-danger">*</span></label><input type="datetime-local" name="scheduled_at" class="form-control" value="{{ task.ScheduledAt.strftime('%Y-%m-%dT%H:%M') if task else '' }}" required></div>
+    <div class="mb-3"><label class="form-label fw-semibold">Mo ta</label><textarea name="description" class="form-control" rows="3">{{ task.Description if task else '' }}</textarea></div>
+    <div class="mb-4"><label class="form-label fw-semibold">Ket qua thuc hien / bao tri</label><textarea name="result_note" class="form-control" rows="3">{{ task.ResultNote if task else '' }}</textarea></div>
+    <div class="d-flex gap-2"><button class="btn btn-primary"><i class="bi bi-check-circle me-1"></i> {{ action }}</button><a class="btn btn-outline-secondary" href="{{ url_for('housekeeping.list_tasks') }}"><i class="bi bi-arrow-left me-1"></i> Quay lai</a></div>
+</form></div></div></div></div>
+{% endblock %}

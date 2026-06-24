@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Danh sách phòng{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-door-open-fill text-primary"></i> Quản lý danh sách phòng</h4>
+    {% if session.role in ('admin', 'manager') %}
+    <a href="{{ url_for('room.create_room') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Thêm phòng
+    </a>
+    {% endif %}
+</div>
+
+<!-- Lọc theo trạng thái -->
+<div class="mb-3 d-flex gap-2 flex-wrap">
+    <a href="{{ url_for('room.list_rooms') }}"
+       class="btn btn-sm {{ 'btn-primary' if not status_filter else 'btn-outline-secondary' }}">Tất cả</a>
+    {% for s in valid_statuses %}
+    <a href="{{ url_for('room.list_rooms', status=s) }}"
+       class="btn btn-sm {{ 'btn-primary' if status_filter == s else 'btn-outline-secondary' }}">
+        {{ s | capitalize }}
+    </a>
+    {% endfor %}
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        {% if rooms %}
+        <table class="table table-hover mb-0">
+            <thead class="table-primary">
+                <tr><th>Số phòng</th><th>Loại</th><th>Tầng</th><th>Mô tả</th><th>Trạng thái</th>
+                {% if session.role in ('admin','manager') %}<th class="text-center">Thao tác</th>{% endif %}</tr>
+            </thead>
+            <tbody>
+                {% for r in rooms %}
+                <tr>
+                    <td class="fw-semibold">{{ r.RoomNumber }}</td>
+                    <td>{{ r.RoomType }}</td>
+                    <td>Tầng {{ r.Floor }}</td>
+                    <td class="text-muted">{{ r.Description or "—" }}</td>
+                    <td>
+                        {% if r.Status == "available" %}
+                            <span class="badge bg-success">Trống</span>
+                        {% elif r.Status == "occupied" %}
+                            <span class="badge bg-danger">Có khách</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Bảo trì</span>
+                        {% endif %}
+                    </td>
+                    {% if session.role in ('admin','manager') %}
+                    <td class="text-center">
+                        <a href="{{ url_for('room.edit_room', room_id=r.RoomID) }}" class="btn btn-sm btn-outline-primary me-1">
+                            <i class="bi bi-pencil"></i> Sửa
+                        </a>
+                        <form method="POST" action="{{ url_for('room.delete_room', room_id=r.RoomID) }}"
+                              class="d-inline" onsubmit="return confirm('Xóa phòng {{ r.RoomNumber }}?')">
+                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i> Xóa</button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center text-muted py-5">
+            <i class="bi bi-door-closed fs-1"></i>
+            <p class="mt-2">Chưa có phòng nào.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

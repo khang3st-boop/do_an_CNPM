@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Don phong / Bao tri{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-tools text-primary"></i> Lich don phong & bao tri</h4>
+    {% if session.role in ('admin','manager') %}<a href="{{ url_for('housekeeping.create_task') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> Tao cong viec</a>{% endif %}
+</div>
+<div class="mb-3 d-flex gap-2 flex-wrap">
+    <a href="{{ url_for('housekeeping.list_tasks') }}" class="btn btn-sm {{ 'btn-primary' if not status_filter else 'btn-outline-secondary' }}">Tat ca</a>
+    {% set labels={'pending':'Cho xu ly','in_progress':'Dang lam','done':'Hoan thanh','cancelled':'Da huy'} %}
+    {% for s in valid_statuses %}<a href="{{ url_for('housekeeping.list_tasks', status=s) }}" class="btn btn-sm {{ 'btn-primary' if status_filter == s else 'btn-outline-secondary' }}">{{ labels.get(s,s) }} <span class="badge bg-light text-dark">{{ counts.get(s,0) }}</span></a>{% endfor %}
+    <a href="{{ url_for('housekeeping.list_tasks', status='overdue') }}" class="btn btn-sm {{ 'btn-danger' if status_filter == 'overdue' else 'btn-outline-danger' }}">Qua han <span class="badge bg-light text-dark">{{ counts.get('overdue',0) }}</span></a>
+</div>
+<div class="card shadow-sm"><div class="card-body p-0">
+{% if tasks %}
+<table class="table table-hover mb-0"><thead class="table-primary"><tr><th>#</th><th>Phong</th><th>Loai</th><th>Nguoi phu trach</th><th>Lich lam</th><th>Uu tien</th><th>Trang thai</th><th>Ket qua</th><th class="text-center">Thao tac</th></tr></thead><tbody>
+{% set type_labels={'cleaning':'Don phong','maintenance':'Bao tri','inspection':'Kiem tra','setup':'Setup'} %}
+{% set pr_labels={'low':'Thap','normal':'Binh thuong','high':'Cao','urgent':'Khan cap'} %}
+{% for t in tasks %}
+<tr>
+<td>{{ t.TaskID }}</td>
+<td class="fw-semibold">{{ t.room.RoomNumber if t.room else '-' }}</td>
+<td>{{ type_labels.get(t.TaskType,t.TaskType) }}</td>
+<td>{{ t.assigned_to.Username if t.assigned_to else 'Chua giao' }}</td>
+<td>{{ t.ScheduledAt.strftime('%d/%m/%Y %H:%M') }}</td>
+<td><span class="badge bg-{{ 'danger' if t.Priority == 'urgent' else ('warning text-dark' if t.Priority == 'high' else 'secondary') }}">{{ pr_labels.get(t.Priority,t.Priority) }}</span></td>
+<td><span class="badge bg-{{ {'pending':'warning text-dark','in_progress':'info','done':'success','cancelled':'danger'}.get(t.Status,'secondary') }}">{{ labels.get(t.Status,t.Status) }}</span></td>
+<td class="text-muted small">{{ t.ResultNote or '-' }}</td>
+<td class="text-center">
+    <form class="d-inline-flex gap-1 align-items-center" method="POST" action="{{ url_for('housekeeping.update_task_status', task_id=t.TaskID) }}">
+        <select class="form-select form-select-sm" name="status">{% for s in valid_statuses %}<option value="{{ s }}" {{ 'selected' if t.Status == s }}>{{ labels.get(s,s) }}</option>{% endfor %}</select>
+        <input class="form-control form-control-sm" name="result_note" placeholder="Ket qua" value="{{ t.ResultNote or '' }}" style="width: 140px;">
+        <button class="btn btn-sm btn-outline-success"><i class="bi bi-check2"></i></button>
+    </form>
+    {% if session.role in ('admin','manager') %}
+    <a class="btn btn-sm btn-outline-primary mx-1" href="{{ url_for('housekeeping.edit_task', task_id=t.TaskID) }}"><i class="bi bi-pencil"></i></a>
+    <form class="d-inline" method="POST" action="{{ url_for('housekeeping.delete_task', task_id=t.TaskID) }}" onsubmit="return confirm('Xoa cong viec nay?')"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+    {% endif %}
+</td>
+</tr>
+{% endfor %}</tbody></table>
+{% else %}<div class="text-center text-muted py-5"><i class="bi bi-check2-square fs-1"></i><p class="mt-2">Chua co cong viec nao.</p></div>{% endif %}
+</div></div>
+{% endblock %}

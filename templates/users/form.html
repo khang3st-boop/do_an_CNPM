@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ action }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-bold">
+                <i class="bi bi-person-fill text-primary"></i> {{ action }}
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% if not user %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ten dang nhap <span class="text-danger">*</span></label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mat khau <span class="text-danger">*</span></label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    {% else %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Ten dang nhap</label>
+                        <input type="text" class="form-control" value="{{ user.Username }}" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mat khau moi <span class="text-muted small">(de trong neu khong doi)</span></label>
+                        <input type="password" name="new_password" class="form-control">
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ user.Email if user else '' }}">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-semibold">Vai tro</label>
+                            <select name="role" class="form-select">
+                                {% for r in ['staff','receptionist','housekeeping','manager','admin'] %}
+                                <option value="{{ r }}" {% if user and user.Role == r %}selected{% endif %}>{{ r }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-semibold">Bo phan</label>
+                            <select name="department" class="form-select">
+                                {% for d in ['reception','housekeeping','maintenance','management','general'] %}
+                                <option value="{{ d }}" {% if user and user.Department == d %}selected{% endif %}>{{ d }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i> {{ action }}</button>
+                        <a href="{{ url_for('user.list_users') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Quay lai</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

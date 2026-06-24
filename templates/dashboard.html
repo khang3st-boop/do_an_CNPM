@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Hotel Reminder{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4><i class="bi bi-speedometer2 text-primary"></i> Dashboard</h4>
+    <a href="{{ url_for('reminder.create_reminder') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Thêm lịch nhắc
+    </a>
+</div>
+
+<!-- Thống kê nhanh -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <h2 class="text-primary">{{ all_reminders | length }}</h2>
+                <p class="text-muted mb-0">Lịch nhắc</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <h2 class="text-warning">{{ upcoming | length }}</h2>
+                <p class="text-muted mb-0">Lịch sắp tới</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-info">
+            <div class="card-body text-center">
+                <h2 class="text-info">
+                    <a href="{{ url_for('guest.list_bookings') }}" class="text-decoration-none text-info">
+                        <i class="bi bi-calendar-check"></i> Đặt phòng
+                    </a>
+                </h2>
+                <p class="text-muted mb-0">Quản lý booking</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <h2 class="text-success">
+                    <a href="{{ url_for('housekeeping.list_tasks') }}" class="text-decoration-none text-success">
+                        <i class="bi bi-tools"></i> Dọn phòng
+                    </a>
+                </h2>
+                <p class="text-muted mb-0">Quản lý công việc</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lịch sắp tới -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white fw-bold">
+        <i class="bi bi-clock-history text-warning"></i> Lịch nhắc sắp tới
+    </div>
+    <div class="card-body p-0">
+        {% if upcoming %}
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Tiêu đề</th>
+                    <th>Mô tả</th>
+                    <th>Thời gian</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in upcoming %}
+                <tr>
+                    <td class="fw-semibold">{{ r.Title }}</td>
+                    <td class="text-muted">{{ r.Description or "—" }}</td>
+                    <td>
+                        <span class="badge bg-warning text-dark">
+                            {{ r.ReminderTime.strftime("%d/%m/%Y %H:%M") }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if r.Status == "Chưa đến hạn" %}
+                            <span class="badge bg-warning text-dark">Chưa đến hạn</span>
+                        {% elif r.Status == "Đã nhắc" %}
+                            <span class="badge bg-info">Đã nhắc</span>
+                        {% elif r.Status == "Hoàn thành" %}
+                            <span class="badge bg-success">Hoàn thành</span>
+                        {% elif r.Status == "Quá hạn" %}
+                            <span class="badge bg-danger">Quá hạn</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ r.Status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('reminder.edit_reminder', reminder_id=r.ReminderID) }}"
+                           class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center text-muted py-4">
+            <i class="bi bi-calendar-check fs-2"></i>
+            <p class="mt-2">Không có lịch nhắc nào sắp tới.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

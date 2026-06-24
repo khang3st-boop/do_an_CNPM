@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Thong bao noi bo{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-chat-dots text-primary"></i> Thong bao noi bo</h4>
+    <a href="{{ url_for('internal_notif.create_notification') }}" class="btn btn-primary"><i class="bi bi-send me-1"></i> Gui thong bao</a>
+</div>
+<div class="card shadow-sm"><div class="card-body p-0">
+{% if notifications %}<div class="list-group list-group-flush">
+{% for n in notifications %}
+<div class="list-group-item {{ '' if n.UserRead else 'list-group-item-warning' }}">
+    <div class="d-flex justify-content-between align-items-start gap-3">
+        <div>
+            <h6 class="mb-1">{{ n.Title }} <span class="badge bg-{{ {'low':'secondary','normal':'primary','high':'warning text-dark','urgent':'danger'}.get(n.Priority,'secondary') }}">{{ n.Priority }}</span></h6>
+            <p class="mb-1 text-muted">{{ n.Content }}</p>
+            <small>
+                Tu: {{ n.sender.Username if n.sender else '-' }}
+                {% if n.receiver %} -> {{ n.receiver.Username }}
+                {% elif n.ToDepartment %} -> Bo phan {{ n.ToDepartment }}
+                {% else %} -> Tat ca{% endif %}
+                · {{ n.CreatedAt.strftime('%d/%m/%Y %H:%M') }}
+            </small>
+        </div>
+        <div class="d-flex gap-2">
+            {% if not n.UserRead %}
+            <form method="POST" action="{{ url_for('internal_notif.mark_notification_read', notif_id=n.NotifID) }}">
+                <button class="btn btn-sm btn-outline-success"><i class="bi bi-check2-circle"></i> Da doc</button>
+            </form>
+            {% endif %}
+            <form method="POST" action="{{ url_for('internal_notif.delete_notification', notif_id=n.NotifID) }}" onsubmit="return confirm('Xoa thong bao nay?')">
+                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}</div>{% else %}<div class="text-center text-muted py-5"><i class="bi bi-inbox fs-1"></i><p class="mt-2">Chua co thong bao noi bo.</p></div>{% endif %}
+</div></div>
+{% endblock %}

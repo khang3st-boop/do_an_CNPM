@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Quản lý đặt phòng{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-calendar-check text-primary"></i> Quản lý đặt phòng</h4>
+    <a href="{{ url_for('guest.create_booking') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> Tạo đặt phòng</a>
+</div>
+<div class="mb-3 d-flex gap-2 flex-wrap">
+    <a href="{{ url_for('guest.list_bookings') }}" class="btn btn-sm {{ 'btn-primary' if not status_filter else 'btn-outline-secondary' }}">Tất cả</a>
+    {% for s in valid_statuses %}<a href="{{ url_for('guest.list_bookings', status=s) }}" class="btn btn-sm {{ 'btn-primary' if status_filter == s else 'btn-outline-secondary' }}">{{ {'confirmed':'Đã xác nhận','checked_in':'Đã nhận phòng','checked_out':'Đã trả phòng','cancelled':'Đã huỷ'}.get(s,s) }}</a>{% endfor %}
+</div>
+<div class="card shadow-sm"><div class="card-body p-0">
+{% if bookings %}
+<table class="table table-hover mb-0"><thead class="table-primary"><tr><th>#</th><th>Khách</th><th>Phòng</th><th>Nhận</th><th>Trả</th><th>Tổng tiền</th><th>Trạng thái</th><th class="text-center">Thao tác</th></tr></thead><tbody>
+{% for b in bookings %}
+<tr>
+<td>{{ b.BookingID }}</td>
+<td class="fw-semibold">{{ b.guest.FullName if b.guest else '—' }}</td>
+<td>{{ b.room.RoomNumber if b.room else '—' }}</td>
+<td>{{ b.CheckIn.strftime('%d/%m/%Y %H:%M') }}</td>
+<td>{{ b.CheckOut.strftime('%d/%m/%Y %H:%M') }}</td>
+<td>{{ '{:,.0f}'.format(b.TotalPrice or 0) }}đ</td>
+<td>
+    {% set labels={'confirmed':'Đã xác nhận','checked_in':'Đã nhận phòng','checked_out':'Đã trả phòng','cancelled':'Đã huỷ'} %}
+    {% set colors={'confirmed':'primary','checked_in':'success','checked_out':'secondary','cancelled':'danger'} %}
+    <span class="badge bg-{{ colors.get(b.Status,'secondary') }}">{{ labels.get(b.Status,b.Status) }}</span>
+</td>
+<td class="text-center">
+    <form class="d-inline" method="POST" action="{{ url_for('guest.change_booking_status', booking_id=b.BookingID) }}">
+        <select name="status" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+            {% for s in valid_statuses %}<option value="{{ s }}" {{ 'selected' if b.Status == s }}>{{ labels.get(s,s) }}</option>{% endfor %}
+        </select>
+    </form>
+    {% if session.role in ('admin','manager') %}
+    <a href="{{ url_for('guest.edit_booking', booking_id=b.BookingID) }}" class="btn btn-sm btn-outline-primary mx-1"><i class="bi bi-pencil"></i></a>
+    <form class="d-inline" method="POST" action="{{ url_for('guest.delete_booking', booking_id=b.BookingID) }}" onsubmit="return confirm('Xóa đặt phòng này?')"><button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></form>
+    {% endif %}
+</td>
+</tr>
+{% endfor %}</tbody></table>
+{% else %}
+<div class="text-center text-muted py-5"><i class="bi bi-calendar-x fs-1"></i><p class="mt-2">Chưa có đặt phòng nào.</p></div>
+{% endif %}
+</div></div>
+{% endblock %}
